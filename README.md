@@ -12,7 +12,7 @@ There is also a color scheme to help the user visually identify what is past, pr
 
 ## Visuals
 
-![Alt text](./assets/images/currentState.PNG?raw=true "Current Release")
+![Alt text](./Assets/currentState.PNG?raw=true "Current Release")
 
 ## Installation
 
