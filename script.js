@@ -1,5 +1,5 @@
 // some inspiration provided by Xpert, an AI Learning Assistant for EdX
-var timeDisplayEl = $('#currentDay');
+const timeDisplayEl = $('#currentDay');
 const timeBlock = document.querySelectorAll('.time-block');
 const classesToRemove = ['.past','.present','.future'];
 const buttons = document.querySelectorAll('.saveBtn');
@@ -9,36 +9,33 @@ const buttons = document.querySelectorAll('.saveBtn');
 // in the html.
 
 $(function () {
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-
 
   function handleClick(event) {
-    const timeBlock = event.target.closest('.time-block');
-    if (timeBlock) {
-      const hourId = timeBlock.id;
-      console.log(hourId);
-    }
-  }
-  
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
+    let parentElement = this.parentNode;
+    let textareaElement = parentElement.querySelector(".description");
+    
+    let parentElementId = parentElement.id;
+    let textareaValue = textareaElement.value;
 
+    localStorage.setItem(parentElementId, textareaValue);
+  }
+
+  function loadStorage(buttonList) {
+    buttonList.forEach(button => {
+    let parentElement = button.parentNode;
+    let textareaElement = parentElement.querySelector(".description");
+    let parentElementId = parentElement.id;
+    textareaElement.value = "";
+    textareaElement.value = localStorage.getItem(parentElementId);
+    });
+  }
 
 function checkHourChange() {
   // Find the difference between now and the end of the hour
   const timeUntilNextHour = dayjs().endOf('hour').add(1, 'hour').diff(dayjs(), 'millisecond');
   // call our class change function
-  addClassBasedOnTime()
-
+  addClassBasedOnTime();
+  timeDisplayEl.text(dayjs().format('dddd, MMMM D'));
   // Call the function again after the time remaining until the next hour
   setTimeout(checkHourChange, timeUntilNextHour);
 }
@@ -62,14 +59,9 @@ function checkHourChange() {
     }
   }
 
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
   timeDisplayEl.text(dayjs().format('dddd, MMMM D'));
 
+  loadStorage(buttons);
   checkHourChange();
 
   buttons.forEach(button => {
