@@ -1,4 +1,8 @@
+// some inspiration provided by Xpert, an AI Learning Assistant for EdX
 var timeDisplayEl = $('#currentDay');
+const timeBlock = document.querySelectorAll('.time-block');
+const classesToRemove = ['.past','.present','.future'];
+const buttons = document.querySelectorAll('.saveBtn');
 
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
@@ -11,10 +15,8 @@ $(function () {
   // function? How can DOM traversal be used to get the "hour-x" id of the
   // time-block containing the button that was clicked? How might the id be
   // useful when saving the description in local storage?
-  const buttons = document.querySelectorAll('.saveBtn');
-buttons.forEach(button => {
-  button.addEventListener('click', handleClick);
-});
+
+
   function handleClick(event) {
     const timeBlock = event.target.closest('.time-block');
     if (timeBlock) {
@@ -22,6 +24,7 @@ buttons.forEach(button => {
       console.log(hourId);
     }
   }
+  
   //
   // TODO: Add code to apply the past, present, or future class to each time
   // block by comparing the id to the current hour. HINTS: How can the id
@@ -29,12 +32,35 @@ buttons.forEach(button => {
   // past, present, and future classes? How can Day.js be used to get the
   // current hour in 24-hour time?
 
+
+function checkHourChange() {
+  // Find the difference between now and the end of the hour
+  const timeUntilNextHour = dayjs().endOf('hour').add(1, 'hour').diff(dayjs(), 'millisecond');
+  // call our class change function
+  addClassBasedOnTime()
+
+  // Call the function again after the time remaining until the next hour
+  setTimeout(checkHourChange, timeUntilNextHour);
+}
+
   function addClassBasedOnTime() {
+    let currentHour = parseInt(dayjs().format('H'));
+    timeBlock.forEach(element => {
+      classesToRemove.forEach(className => {
+        element.classList.remove(className);
+      });
+    });
     for (let hour = 1; hour < 25; hour++) {
-      let elementId = `hour-${hour}`;
-      $(`#${elementId}`).addClass('present');
+      elementId = `hour-${hour}`;
+      if (hour < currentHour) {
+        $(`#${elementId}`).addClass('past');
+      } else if (hour === currentHour) {
+        $(`#${elementId}`).addClass('present')
+      } else {
+        $(`#${elementId}`).addClass('future')
+      }
     }
-    }
+  }
 
   //
   // TODO: Add code to get any user input that was saved in localStorage and set
@@ -42,8 +68,11 @@ buttons.forEach(button => {
   // attribute of each time-block be used to do this?
   //
   // TODO: Add code to display the current date in the header of the page.
-  var formattedDate = dayjs().format('dddd, MMMM D');
-  timeDisplayEl.text(formattedDate);
-  console.log(dayjs().format('H'));
-  addClassBasedOnTime()
+  timeDisplayEl.text(dayjs().format('dddd, MMMM D'));
+
+  checkHourChange();
+
+  buttons.forEach(button => {
+    button.addEventListener('click', handleClick);
+  });
 });
